@@ -1,11 +1,10 @@
-FROM debian:jessie
+FROM alpine
 
 ENV RCLONE_VERSION=1.32 \
   CONFD_VERSION=0.11.0
 
-RUN apt-get update && \
-  apt-get -y install wget unzip && \
-  rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache wget unzip \
+  && rm -rf /var/lib/apt/lists/*
 
 RUN wget http://downloads.rclone.org/rclone-v${RCLONE_VERSION}-linux-amd64.zip && \
   unzip rclone-v${RCLONE_VERSION}-linux-amd64.zip && \
@@ -13,7 +12,7 @@ RUN wget http://downloads.rclone.org/rclone-v${RCLONE_VERSION}-linux-amd64.zip &
   mv rclone-*/rclone /usr/bin && \
   rm -rf rclone-*
 
-RUN wget https://github.com/kelseyhightower/confd/releases/download/v${CONFD_VERSION}/confd-${CONFD_VERSION}-linux-amd64 -O /usr/bin/confd && \
+RUN wget --no-check-certificate https://github.com/kelseyhightower/confd/releases/download/v${CONFD_VERSION}/confd-${CONFD_VERSION}-linux-amd64 -O /usr/bin/confd && \
   chmod +x /usr/bin/confd
 
 COPY ./confd /etc/confd
