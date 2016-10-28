@@ -3,7 +3,7 @@ FROM alpine
 ENV RCLONE_VERSION=1.33 \
   CONFD_VERSION=0.11.0
 
-RUN apk add --no-cache wget unzip \
+RUN apk add --no-cache wget unzip ca-certificates \
   && rm -rf /var/lib/apt/lists/*
 
 RUN wget http://downloads.rclone.org/rclone-v${RCLONE_VERSION}-linux-amd64.zip && \
