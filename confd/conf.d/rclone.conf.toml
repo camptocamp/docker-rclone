@@ -1,3 +1,0 @@
-[template]
-src = "rclone.conf.tmpl"
-dest = "/root/.rclone.conf"
