@@ -1,6 +1,6 @@
 FROM alpine
 
-ENV RCLONE_VERSION=1.33 \
+ENV RCLONE_VERSION=1.36 \
   CONFD_VERSION=0.12.0-alpha3
 
 RUN apk add --no-cache wget unzip ca-certificates \
