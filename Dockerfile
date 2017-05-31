@@ -2,7 +2,7 @@ FROM alpine
 
 ENV RCLONE_VERSION=1.36
 
-RUN apk add --no-cache wget unzip ca-certificates curl
+RUN apk add --no-cache wget unzip ca-certificates curl bash coreutils
 
 RUN wget http://downloads.rclone.org/rclone-v${RCLONE_VERSION}-linux-amd64.zip && \
   unzip rclone-v${RCLONE_VERSION}-linux-amd64.zip && \
