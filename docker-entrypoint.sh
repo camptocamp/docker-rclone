@@ -1,7 +1,7 @@
 #!/bin/bash
 
 rm -f rclone.log
-/usr/bin/rclone "$@" | tee rclone.log
+/usr/bin/rclone "$@" |& tee rclone.log
 
 
 if [ ! -z "${PUSHGATEWAY_URL}" ]; then
@@ -13,11 +13,11 @@ if [ ! -z "${PUSHGATEWAY_URL}" ]; then
     instance=$(hostname -f)
   fi
 
-  read src dst < <(sed -n '0,/.*with parameters.* "src:\([^"]\+\)" "dst:\([^"]\+\)"]/ s//\1 \2/p' < <(cat rclone.log))
-  transferred_raw=$(sed -n '0,/Transferred: *\([^ ]\+\) \([A-Za-z]\)Bytes.*/ s//\1\2/p' < <(cat rclone.log))
+  read src dst < <(sed -n '/.*with parameters.* "src:\([^"]\+\)" "dst:\([^"]\+\)"]/ s//\1 \2/p' rclone.log | tail -n1)
+  transferred_raw=$(sed -n '/Transferred: *\([^ ]\+\) \([A-Za-z]\?\)Bytes.*/ s//\1\2/p' rclone.log | tail -n1)
   transferred=$(numfmt --from=iec $transferred_raw)
-  errors=$(sed -n '0,/Errors: */ s///p' < <(cat rclone.log))
-  checks=$(sed -n '0,/Checks: */ s///p' < <(cat rclone.log))
+  errors=$(sed -n '/Errors: */ s///p' rclone.log | tail -n1)
+  checks=$(sed -n '/Checks: */ s///p' rclone.log | tail -n1)
 
   cat <<EOF | curl --data-binary @- "${PUSHGATEWAY_URL}/metrics/job/rclone/instance/${instance}/source/${src}/destination/${dst}"
 # TYPE rclone gauge
