@@ -20,12 +20,14 @@ if [ ! -z "${PUSHGATEWAY_URL}" ]; then
   checks=$(sed -n '/Checks: */ s///p' rclone.log | tail -n1)
 
   cat <<EOF | curl -s --data-binary @- "${PUSHGATEWAY_URL}/metrics/job/rclone/source/${src}/destination/${dst}"
-# TYPE rclone gauge
-rclone{what="transferred_bytes"} ${transferred}
-rclone{what="errors"} ${errors}
-rclone{what="checks"} ${checks}
-# TYPE rclone_endTime counter
-rclone_endTime $(date +%s)
+# TYPE rclone_transferred_bytes gauge
+rclone_transferred_bytes ${transferred}
+# TYPE rclone_errors gauge
+rclone_errors ${errors}
+# TYPE rclone_checks gauge
+rclone_checks ${checks}
+# TYPE rclone_end_time counter
+rclone_end_time $(date +%s)
 EOF
 
 echo "Metrics sent."
