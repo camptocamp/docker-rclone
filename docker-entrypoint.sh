@@ -15,7 +15,7 @@ if [ ! -z "${PUSHGATEWAY_URL}" ]; then
 
   read src dst < <(sed -n '/.*with parameters.* "src:\([^"]\+\)" "dst:\([^"]\+\)"]/ s//\1 \2/p' rclone.log | tail -n1)
   transferred_raw=$(sed -n '/Transferred: *\([^ ]\+\) \([A-Za-z]\?\)Bytes.*/ s//\1\2/p' rclone.log | tail -n1)
-  transferred=$(numfmt --from=iec $transferred_raw)
+  transferred=$(numfmt --from=iec ${transferred_raw^^})
   errors=$(sed -n '/Errors: */ s///p' rclone.log | tail -n1)
   checks=$(sed -n '/Checks: */ s///p' rclone.log | tail -n1)
 
@@ -24,5 +24,9 @@ if [ ! -z "${PUSHGATEWAY_URL}" ]; then
 rclone{what="transferred_bytes"} ${transferred}
 rclone{what="errors"} ${errors}
 rclone{what="checks"} ${checks}
+# TYPE rclone_endTime counter
+rclone_endTime $(date +%s)
 EOF
+
+echo "Metrics sent."
 fi
