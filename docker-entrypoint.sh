@@ -19,6 +19,9 @@ if [ ! -z "${PUSHGATEWAY_URL}" ]; then
   errors=$(sed -n '/Errors: */ s///p' rclone.log | tail -n1)
   checks=$(sed -n '/Checks: */ s///p' rclone.log | tail -n1)
 
+  src=$($src | sed -r 's/\//_/g')
+  dst=$($dst | sed -r 's/\//_/g')
+
   cat <<EOF | curl -s --data-binary @- "${PUSHGATEWAY_URL}/metrics/job/rclone/source/${src}/destination/${dst}"
 # TYPE rclone_transferred_bytes gauge
 rclone_transferred_bytes ${transferred}
