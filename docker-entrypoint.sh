@@ -13,14 +13,13 @@ if [ ! -z "${PUSHGATEWAY_URL}" ]; then
     instance=$(hostname -f)
   fi
 
-  read src dst < <(sed -n '/.*with parameters.* "src:\([^"]\+\)" "dst:\([^"]\+\)"]/ s//\1 \2/p' rclone.log | tail -n1)
   transferred_raw=$(sed -n '/Transferred: *\([^ ]\+\) \([A-Za-z]\?\)Bytes.*/ s//\1\2/p' rclone.log | tail -n1)
   transferred=$(numfmt --from=iec ${transferred_raw^^})
   errors=$(sed -n '/Errors: */ s///p' rclone.log | tail -n1)
   checks=$(sed -n '/Checks: */ s///p' rclone.log | tail -n1)
 
-  src=$($src | sed -r 's/\//_/g')
-  dst=$($dst | sed -r 's/\//_/g')
+  src=$(cat /proc/1/cmdline|strings|grep ^src:|cut -d: -f2)
+  dst=$(cat /proc/1/cmdline|strings|grep ^dst:|cut -d: -f2)
 
   cat <<EOF | curl -s --data-binary @- "${PUSHGATEWAY_URL}/metrics/job/rclone/source/${src}/destination/${dst}"
 # TYPE rclone_transferred_bytes gauge
