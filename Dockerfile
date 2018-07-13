@@ -1,6 +1,6 @@
 FROM alpine
 
-ENV RCLONE_VERSION=1.40
+ENV RCLONE_VERSION=1.41
 
 RUN apk add --no-cache wget unzip ca-certificates curl bash coreutils
 
