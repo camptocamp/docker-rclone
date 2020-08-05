@@ -1,8 +1,17 @@
 #!/bin/bash
 
-rm -f rclone.log
-/usr/bin/rclone "$@" |& tee rclone.log
+set -x
 
+rm -f rclone.log
+
+if [ "$CATTLE_DYNAMIC_PATH" = true ] && [ ! -z "${VOLUME_NAME}" ]; then
+  instance=$(curl http://rancher-metadata/latest/self/host/name)
+  dynamic_path="${DESTINATION_BUCKET}/${instance}/${VOLUME_NAME}"
+  echo "Computed dynamic path: ${dynamic_path}"
+  /usr/bin/rclone "$@" dst:$dynamic_path |& tee rclone.log
+else
+  /usr/bin/rclone "$@" |& tee rclone.log
+fi
 
 if [ ! -z "${PUSHGATEWAY_URL}" ]; then
   echo "Sending metrics to ${PUSHGATEWAY_URL}"
