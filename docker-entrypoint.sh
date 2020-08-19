@@ -21,7 +21,7 @@ fi
 
 if [ ! -z "${PUSHGATEWAY_URL}" ]; then
   echo "Sending metrics to ${PUSHGATEWAY_URL}"
-
+  errors=0
 
   if [ ! "$CATTLE_DYNAMIC_PATH" = true ]; then
     if getent hosts rancher-metadata >/dev/null; then
@@ -31,10 +31,9 @@ if [ ! -z "${PUSHGATEWAY_URL}" ]; then
     fi
   fi
 
-  transferred_raw=$(sed -n '/Transferred: *\([^ ]\+\) \([A-Za-z]\?\)Bytes.*/ s//\1\2/p' rclone.log | tail -n1)
-  transferred=$(numfmt --from=iec ${transferred_raw^^})
+  transferred=$(sed -n '/Transferred: */ s///p' rclone.log | tail -n1 | awk '{print $1}')
   errors=$(sed -n '/Errors: */ s///p' rclone.log | tail -n1)
-  checks=$(sed -n '/Checks: */ s///p' rclone.log | tail -n1)
+  checks=$(sed -n '/Checks: */ s///p' rclone.log | tail -n1 | awk '{print $1}')
 
   cat <<EOF | curl -s --data-binary @- "${PUSHGATEWAY_URL}/metrics/job/rclone/source/${src}/destination/${dst}/instance/${instance}"
 # TYPE rclone_transferred_bytes gauge
