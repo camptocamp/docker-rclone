@@ -31,9 +31,10 @@ if [ ! -z "${PUSHGATEWAY_URL}" ]; then
     fi
   fi
 
-  transferred=$(sed -n '/Transferred: */ s///p' rclone.log | tail -n1 | awk '{print $1}')
-  errors=$(sed -n '/Errors: */ s///p' rclone.log | tail -n1)
-  checks=$(sed -n '/Checks: */ s///p' rclone.log | tail -n1 | awk '{print $1}')
+  transferred=$(sed -n '/^Transferred: */ s///p' rclone.log | tail -n1 | awk '{print $1}')
+  errors_logged=$(sed -n '/^Errors: */ s///p' rclone.log | tail -n1)
+  errors=${errors_logged:-"0"}
+  checks=$(sed -n '/^Checks: */ s///p' rclone.log | tail -n1 | awk '{print $1}')
 
   cat <<EOF | curl -s --data-binary @- "${PUSHGATEWAY_URL}/metrics/job/rclone/source/${src}/destination/${dst}/instance/${instance}"
 # TYPE rclone_transferred_bytes gauge
