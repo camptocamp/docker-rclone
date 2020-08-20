@@ -36,7 +36,7 @@ if [ ! -z "${PUSHGATEWAY_URL}" ]; then
   else
     transferred=$(numfmt --from=iec ${transferred_raw^^})
   fi
-  errors_logged=$(sed -n '/^Errors: */ s///p' rclone.log | tail -n1)
+  errors_logged=$(sed -n '/^Errors: */ s///p' rclone.log | tail -n1 | awk '{print $1}')
   errors=${errors_logged:-"0"}
   checks_logged=$(sed -n '/^Checks: */ s///p' rclone.log | tail -n1 | awk '{print $1}')
   checks=${checks_logged:-"0"}
