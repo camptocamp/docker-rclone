@@ -34,7 +34,6 @@ if [ ! -z "${PUSHGATEWAY_URL}" ]; then
   if [ -z "$transferred_raw" ] ; then
     transferred="0"
   else
-    transferred_raw=${transferred_raw/./,}
     transferred=$(numfmt --from=iec ${transferred_raw^^})
   fi
   errors_logged=$(sed -n '/^Errors: */ s///p' rclone.log | tail -n1)
